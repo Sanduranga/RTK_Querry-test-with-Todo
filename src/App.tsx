@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
@@ -12,6 +12,24 @@ function App() {
   const [editIndx, setEditIndx] = useState<number>();
   console.log(input);
   console.log(list);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("http://localhost:5555/todos");
+        if (!res.ok) {
+          throw new Error("Fetching error!!");
+        }
+        const { responce } = await res.json();
+        console.log(responce);
+
+        setList(responce);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleClick = (e: FormEvent) => {
     e.preventDefault();
