@@ -8,15 +8,32 @@ function App() {
   }
   const [input, setInput] = useState({} as todoObj);
   const [list, setList] = useState<todoObj[]>([]);
+  const [editOn, setEditOn] = useState<boolean>(false);
+  const [editIndx, setEditIndx] = useState<number>();
   console.log(input);
   console.log(list);
 
   const handleClick = (e: FormEvent) => {
     e.preventDefault();
-
-    setList((prev) => [...prev, input]);
+    if (editOn === false) {
+      setList((prev) => [...prev, input]);
+    } else {
+      const editArray = [...list];
+      if (editIndx !== undefined) {
+        editArray[editIndx] = input;
+      }
+      setList(editArray);
+      setEditOn(false);
+    }
 
     setInput({ id: "", task: "" });
+  };
+
+  const handleEdit = (index: number) => {
+    const editItem: todoObj[] = list.filter((_, indx) => indx === index);
+    setInput(editItem[0]);
+    setEditOn(true);
+    setEditIndx(index);
   };
 
   return (
@@ -80,7 +97,10 @@ function App() {
                       >
                         dele
                       </button>
-                      <button className="px-2 bg-yellow-600 rounded-md shadow-lg font-semibold">
+                      <button
+                        onClick={() => handleEdit(index)}
+                        className="px-2 bg-yellow-600 rounded-md shadow-lg font-semibold"
+                      >
                         edit
                       </button>
                     </div>
