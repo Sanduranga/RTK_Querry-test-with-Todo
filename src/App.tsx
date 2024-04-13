@@ -3,15 +3,15 @@ import "./App.css";
 
 function App() {
   interface todoObj {
+    _id: string;
     id: string;
     task: string;
   }
+
   const [input, setInput] = useState({} as todoObj);
   const [list, setList] = useState<todoObj[]>([]);
   const [editOn, setEditOn] = useState<boolean>(false);
-  const [editIndx, setEditIndx] = useState<number>();
-  console.log(input);
-  console.log(list);
+  const [editIndx, setEditIndx] = useState<string>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,10 +20,10 @@ function App() {
         if (!res.ok) {
           throw new Error("Fetching error!!");
         }
-        const { responce } = await res.json();
-        console.log(responce);
+        const { response } = await res.json();
+        console.log(response);
 
-        setList(responce);
+        setList(response);
       } catch (error) {
         console.log(error);
       }
@@ -56,22 +56,70 @@ function App() {
       };
       postTodo();
     } else {
-      const editArray = [...list];
-      if (editIndx !== undefined) {
-        editArray[editIndx] = input;
-      }
-      setList(editArray);
+      // const editArray = [...list];
+      // if (editIndx !== undefined) {
+      //   editArray[editIndx] = input;
+      // }
+      // setList(editArray);
+      const updateTodo = async () => {
+        try {
+          const res = await fetch("http://localhost:5555/update_todo", {
+            method: "PUT",
+            headers: {
+              "Content-type": "application/json",
+            },
+            body: JSON.stringify({
+              _id: editIndx,
+              id: input.id,
+              task: input.task,
+            }),
+          });
+
+          if (!res.ok) {
+            throw new Error("Todo delete failed!!");
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      updateTodo();
       setEditOn(false);
     }
 
-    setInput({ id: "", task: "" });
+    setInput({ id: "", task: "", _id: "" });
   };
 
-  const handleEdit = (index: number) => {
+  const handleEdit = (index: number, _id: string) => {
     const editItem: todoObj[] = list.filter((_, indx) => indx === index);
     setInput(editItem[0]);
     setEditOn(true);
-    setEditIndx(index);
+    setEditIndx(_id);
+  };
+
+  const handleDelete = (_id: string) => {
+    // () =>   (Down function I had implemented before)
+    //   setList((prev) =>
+    //     prev.filter((_, ind) => ind !== index)
+    //   )
+    const deleteTodo = async () => {
+      try {
+        const res = await fetch("http://localhost:5555/delete_todo", {
+          method: "DELETE",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            id: _id,
+          }),
+        });
+        if (!res.ok) {
+          throw new Error("Todo delete failed!!");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    deleteTodo();
   };
 
   return (
@@ -126,17 +174,13 @@ function App() {
 
                   <div className="flex gap-1">
                     <button
-                      onClick={() =>
-                        setList((prev) =>
-                          prev.filter((_, ind) => ind !== index)
-                        )
-                      }
+                      onClick={() => handleDelete(data._id)}
                       className="px-2 bg-red-600 rounded-md shadow-lg font-semibold"
                     >
                       dele
                     </button>
                     <button
-                      onClick={() => handleEdit(index)}
+                      onClick={() => handleEdit(index, data._id)}
                       className="px-2 bg-yellow-600 rounded-md shadow-lg font-semibold"
                     >
                       edit
