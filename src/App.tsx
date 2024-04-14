@@ -14,22 +14,23 @@ function App() {
   const [editIndx, setEditIndx] = useState<string>();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch("http://localhost:5555/todos");
-        if (!res.ok) {
-          throw new Error("Fetching error!!");
-        }
-        const { response } = await res.json();
-        console.log(response);
-
-        setList(response);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchData();
+    fetchTodos();
   }, []);
+
+  const fetchTodos = async () => {
+    try {
+      const res = await fetch("http://localhost:5555/todos");
+      if (!res.ok) {
+        throw new Error("Fetching error!!");
+      }
+      const { response } = await res.json();
+      console.log(response);
+
+      setList(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleClick = (e: FormEvent) => {
     e.preventDefault();
@@ -53,6 +54,7 @@ function App() {
         } catch (error) {
           console.log(error);
         }
+        fetchTodos();
       };
       postTodo();
     } else {
@@ -81,8 +83,10 @@ function App() {
         } catch (error) {
           console.log(error);
         }
+        fetchTodos();
       };
       updateTodo();
+
       setEditOn(false);
     }
 
@@ -118,6 +122,7 @@ function App() {
       } catch (error) {
         console.log(error);
       }
+      fetchTodos();
     };
     deleteTodo();
   };
