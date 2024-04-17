@@ -1,16 +1,22 @@
 import { FormEvent, useEffect, useState } from "react";
 import "./App.css";
 import { todoObj } from "./models/models";
-import { useGetTodosQuery, usePostTodosMutation } from "./redux/todotApi";
+import {
+  useDeleteTodoMutation,
+  useGetTodosQuery,
+  usePostTodosMutation,
+  useUpdateTodoMutation,
+} from "./redux/todotApi";
 
 function App() {
   const [input, setInput] = useState({} as todoObj);
   // const [list, setList] = useState<todoObj[]>([]);
   const [editOn, setEditOn] = useState<boolean>(false);
-  const [editIndx, setEditIndx] = useState<string>();
+  const [editIndx, setEditIndx] = useState<string>("");
   const { data, isLoading, error, isSuccess } = useGetTodosQuery();
   const [postTodos] = usePostTodosMutation();
-  console.log(data);
+  const [deleteTodo] = useDeleteTodoMutation();
+  const [updateTodo] = useUpdateTodoMutation();
 
   useEffect(() => {
     fetchTodos();
@@ -61,29 +67,30 @@ function App() {
       //   editArray[editIndx] = input;
       // }
       // setList(editArray);
-      const updateTodo = async () => {
-        try {
-          const res = await fetch("http://localhost:5555/update_todo", {
-            method: "PUT",
-            headers: {
-              "Content-type": "application/json",
-            },
-            body: JSON.stringify({
-              _id: editIndx,
-              id: input.id,
-              task: input.task,
-            }),
-          });
+      // const updateTodo = async () => {
+      //   try {
+      //     const res = await fetch("http://localhost:5555/update_todo", {
+      //       method: "PUT",
+      //       headers: {
+      //         "Content-type": "application/json",
+      //       },
+      //       body: JSON.stringify({
+      //         _id: editIndx,
+      //         id: input.id,
+      //         task: input.task,
+      //       }),
+      //     });
 
-          if (!res.ok) {
-            throw new Error("Todo delete failed!!");
-          }
-        } catch (error) {
-          console.log(error);
-        }
-        fetchTodos();
-      };
-      updateTodo();
+      //     if (!res.ok) {
+      //       throw new Error("Todo delete failed!!");
+      //     }
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+      //   fetchTodos();
+      // };
+      // updateTodo();
+      updateTodo({ _id: editIndx, id: input.id, task: input.task });
 
       setEditOn(false);
     }
@@ -103,26 +110,28 @@ function App() {
     //   setList((prev) =>
     //     prev.filter((_, ind) => ind !== index)
     //   )
-    const deleteTodo = async () => {
-      try {
-        const res = await fetch("http://localhost:5555/delete_todo", {
-          method: "DELETE",
-          headers: {
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify({
-            id: _id,
-          }),
-        });
-        if (!res.ok) {
-          throw new Error("Todo delete failed!!");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-      fetchTodos();
-    };
-    deleteTodo();
+    // const deleteTodo = async () => {
+
+    deleteTodo(_id);
+    //   try {
+    //     const res = await fetch("http://localhost:5555/delete_todo", {
+    //       method: "DELETE",
+    //       headers: {
+    //         "Content-type": "application/json",
+    //       },
+    //       body: JSON.stringify({
+    //         id: _id,
+    //       }),
+    //     });
+    //     if (!res.ok) {
+    //       throw new Error("Todo delete failed!!");
+    //     }
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    //   fetchTodos();
+    // };
+    // deleteTodo();
   };
 
   return (
