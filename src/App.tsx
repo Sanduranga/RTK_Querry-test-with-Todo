@@ -1,17 +1,15 @@
 import { FormEvent, useEffect, useState } from "react";
 import "./App.css";
+import { todoObj } from "./models/models";
+import { useGetTodosQuery } from "./redux/todotApi";
 
 function App() {
-  interface todoObj {
-    _id: string;
-    id: string;
-    task: string;
-  }
-
   const [input, setInput] = useState({} as todoObj);
-  const [list, setList] = useState<todoObj[]>([]);
+  // const [list, setList] = useState<todoObj[]>([]);
   const [editOn, setEditOn] = useState<boolean>(false);
   const [editIndx, setEditIndx] = useState<string>();
+  const { data, isLoading, error, isSuccess } = useGetTodosQuery();
+  console.log(data);
 
   useEffect(() => {
     fetchTodos();
@@ -19,14 +17,12 @@ function App() {
 
   const fetchTodos = async () => {
     try {
-      const res = await fetch("http://localhost:5555/todos");
-      if (!res.ok) {
-        throw new Error("Fetching error!!");
-      }
-      const { response } = await res.json();
-      console.log(response);
-
-      setList(response);
+      // const res = await fetch("http://localhost:5555/todos");
+      // if (!res.ok) {
+      //   throw new Error("Fetching error!!");
+      // }
+      // const { response } = await res.json();
+      // setList(data ? data : []);
     } catch (error) {
       console.log(error);
     }
@@ -94,7 +90,7 @@ function App() {
   };
 
   const handleEdit = (index: number, _id: string) => {
-    const editItem: todoObj[] = list.filter((_, indx) => indx === index);
+    const editItem: todoObj[] = data?.filter((_, indx) => indx === index) || [];
     setInput(editItem[0]);
     setEditOn(true);
     setEditIndx(_id);
@@ -129,7 +125,7 @@ function App() {
 
   return (
     <div className="flex w-full">
-      <div className="flex flex-col gap-10 mx-auto bg-green-300 px-3 py-4 mt-5 rounded-md shadow-md">
+      <div className="flex flex-col gap-10 mx-auto items-center bg-green-300 px-3 py-4 mt-5 rounded-md shadow-md">
         <div className="mx-auto font-bold text-xl">
           <h1>ToDo App</h1>
         </div>
@@ -169,32 +165,53 @@ function App() {
             </button>
           </div>
         </div>
-        <div className="flex">
-          <div className="w-full">
-            <ul className="flex flex-col gap-2">
-              {list.map((data: todoObj, index) => (
-                <li key={index} className="flex justify-between gap-2">
-                  <span>{data.id}</span>
-                  <h1>{data.task}</h1>
+        <div className="flex flex-col">
+          {isLoading && (
+            <div>
+              <h1 className="text-green-700 font-semibold ">Loading!</h1>
+            </div>
+          )}
+          {isSuccess && (
+            <div className="w-full">
+              <ul className="flex flex-col gap-2">
+                {data.map((data: todoObj, index) => (
+                  <li key={index} className="flex justify-between gap-2">
+                    <span>{data.id}</span>
+                    <h1>{data.task}</h1>
 
-                  <div className="flex gap-1">
-                    <button
-                      onClick={() => handleDelete(data._id)}
-                      className="px-2 bg-red-600 rounded-md shadow-lg font-semibold"
-                    >
-                      dele
-                    </button>
-                    <button
-                      onClick={() => handleEdit(index, data._id)}
-                      className="px-2 bg-yellow-600 rounded-md shadow-lg font-semibold"
-                    >
-                      edit
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => handleDelete(data._id)}
+                        className="px-2 bg-red-600 rounded-md shadow-lg font-semibold"
+                      >
+                        dele
+                      </button>
+                      <button
+                        onClick={() => handleEdit(index, data._id)}
+                        className="px-2 bg-yellow-600 rounded-md shadow-lg font-semibold"
+                      >
+                        edit
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {isSuccess && data.length === 0 && (
+            <div className="w-full">
+              <h1 className="text-red-700 font-semibold">
+                There are no todo's to show
+              </h1>
+            </div>
+          )}
+          {error && (
+            <div>
+              <h1 className="text-red-700 font-semibold">
+                Something went wrong!!
+              </h1>
+            </div>
+          )}
         </div>
       </div>
     </div>
