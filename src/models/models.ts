@@ -3,3 +3,8 @@ export interface todoObj {
   id: string;
   task: string;
 }
+
+export interface todoObj2 {
+  id: string;
+  task: string;
+}

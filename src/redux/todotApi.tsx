@@ -1,19 +1,22 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { todoObj } from "../models/models";
+import { todoObj, todoObj2 } from "../models/models";
 
 export const todoApi = createApi({
   reducerPath: "todoApis",
   baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:5555/" }),
+  tagTypes: ["Todos"],
   endpoints: (builder) => ({
     getTodos: builder.query<todoObj[], void>({
       query: () => "/todos",
+      providesTags: ["Todos"],
     }),
-    postTodos: builder.mutation<todoObj, string>({
+    postTodos: builder.mutation<void, todoObj2>({
       query: (data) => ({
         url: "/todo",
         method: "POST",
-        body: { data },
+        body: data,
       }),
+      invalidatesTags: ["Todos"],
     }),
   }),
 });

@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import "./App.css";
 import { todoObj } from "./models/models";
-import { useGetTodosQuery } from "./redux/todotApi";
+import { useGetTodosQuery, usePostTodosMutation } from "./redux/todotApi";
 
 function App() {
   const [input, setInput] = useState({} as todoObj);
@@ -9,6 +9,7 @@ function App() {
   const [editOn, setEditOn] = useState<boolean>(false);
   const [editIndx, setEditIndx] = useState<string>();
   const { data, isLoading, error, isSuccess } = useGetTodosQuery();
+  const [postTodos] = usePostTodosMutation();
   console.log(data);
 
   useEffect(() => {
@@ -31,28 +32,29 @@ function App() {
   const handleClick = (e: FormEvent) => {
     e.preventDefault();
     if (editOn === false) {
+      postTodos({ id: input.id, task: input.task });
       // setList((prev) => [...prev, input]);
-      const postTodo = async () => {
-        try {
-          const res = await fetch("http://localhost:5555/todo", {
-            method: "POST",
-            headers: {
-              "Content-type": "application/json",
-            },
-            body: JSON.stringify({
-              id: input.id,
-              task: input.task,
-            }),
-          });
-          if (!res.ok) {
-            throw new Error("Data post failed!!");
-          }
-        } catch (error) {
-          console.log(error);
-        }
-        fetchTodos();
-      };
-      postTodo();
+      // const postTodo = async () => {
+      //   try {
+      //     const res = await fetch("http://localhost:5555/todo", {
+      //       method: "POST",
+      //       headers: {
+      //         "Content-type": "application/json",
+      //       },
+      //       body: JSON.stringify({
+      //         id: input.id,
+      //         task: input.task,
+      //       }),
+      //     });
+      //     if (!res.ok) {
+      //       throw new Error("Data post failed!!");
+      //     }
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+      //   fetchTodos();
+      // };
+      // postTodo();
     } else {
       // const editArray = [...list];
       // if (editIndx !== undefined) {
