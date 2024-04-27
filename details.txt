@@ -1,0 +1,7 @@
+qqqq11
+
+https://sranga-test-cog.auth.eu-north-1.amazoncognito.com/oauth2/authorize?response_type=code&client_id=	22a31kmtgod2hbt2dddbasbae9&redirect_uri=http://localhost:5173
+
+http://localhost:5173/?v=wdwdw
+https://localhost:5173/?code=0d06944c-78ca-4e27-a172-2d58258b09df
+http://localhost:5173/?code=81e1b1f1-fc38-449d-a5eb-e8c86cbcb321

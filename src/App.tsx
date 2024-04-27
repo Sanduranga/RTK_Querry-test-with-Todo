@@ -7,9 +7,38 @@ import {
   usePostTodosMutation,
   useUpdateTodoMutation,
 } from "./redux/todotApi";
+import Navbar from "./components/Navbar";
 
-function App() {
+import { Amplify } from "aws-amplify";
+import type { WithAuthenticatorProps } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
+import config from "./Amp";
+import { fetchUserAttributes } from "aws-amplify/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "./redux/store";
+import { setUserName } from "./redux/loggedUserReducer";
+Amplify.configure(config);
+
+function App({ signOut }: WithAuthenticatorProps) {
+  useEffect(() => {
+    // Fetch the authenticated user on component mount
+    handleFetchUserAttributes();
+  }, []);
+  const loggedUserName = useSelector(
+    (state: RootState) => state.loggingUser.name
+  );
+  const dispatch = useDispatch();
+  async function handleFetchUserAttributes() {
+    try {
+      const userAttributes = await fetchUserAttributes();
+      dispatch(setUserName(userAttributes.name));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   const [input, setInput] = useState({} as todoObj);
+
   // const [list, setList] = useState<todoObj[]>([]);
   const [editOn, setEditOn] = useState<boolean>(false);
   const [editIndx, setEditIndx] = useState<string>("");
@@ -18,22 +47,22 @@ function App() {
   const [deleteTodo] = useDeleteTodoMutation();
   const [updateTodo] = useUpdateTodoMutation();
 
-  useEffect(() => {
-    fetchTodos();
-  }, []);
+  // useEffect(() => {
+  //   fetchTodos();
+  // }, []);
 
-  const fetchTodos = async () => {
-    try {
-      // const res = await fetch("http://localhost:5555/todos");
-      // if (!res.ok) {
-      //   throw new Error("Fetching error!!");
-      // }
-      // const { response } = await res.json();
-      // setList(data ? data : []);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const fetchTodos = async () => {
+  //   try {
+  //     // const res = await fetch("http://localhost:5555/todos");
+  //     // if (!res.ok) {
+  //     //   throw new Error("Fetching error!!");
+  //     // }
+  //     // const { response } = await res.json();
+  //     // setList(data ? data : []);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const handleClick = (e: FormEvent) => {
     e.preventDefault();
@@ -106,13 +135,13 @@ function App() {
   };
 
   const handleDelete = (_id: string) => {
+    deleteTodo(_id);
     // () =>   (Down function I had implemented before)
     //   setList((prev) =>
     //     prev.filter((_, ind) => ind !== index)
     //   )
     // const deleteTodo = async () => {
 
-    deleteTodo(_id);
     //   try {
     //     const res = await fetch("http://localhost:5555/delete_todo", {
     //       method: "DELETE",
@@ -135,7 +164,12 @@ function App() {
   };
 
   return (
-    <div className="flex w-full">
+    <div className="flex flex-col w-full">
+      <Navbar />
+      <div>
+        <h1>Hello {loggedUserName}</h1>
+        <button onClick={signOut}>Sign out</button>
+      </div>
       <div className="flex flex-col gap-10 mx-auto items-center bg-green-300 px-3 py-4 mt-5 rounded-md shadow-md">
         <div className="mx-auto font-bold text-xl">
           <h1>ToDo App</h1>
@@ -172,7 +206,7 @@ function App() {
               onClick={handleClick}
               className="px-2 py-1 bg-green-600 rounded-md shadow-lg font-semibold"
             >
-              Enter
+              {editOn ? <span>Update</span> : <span>Enter</span>}
             </button>
           </div>
         </div>
