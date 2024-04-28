@@ -1,69 +1,50 @@
-import { FormEvent, useState } from "react";
-import { todoObj } from "../models/models";
-import { usePostTodosMutation, useUpdateTodoMutation } from "../redux/todotApi";
+import { todoObj2 } from "../models/models";
+
+import { Button, Grid, TextField } from "@mui/material";
+import { useForm } from "react-hook-form";
 
 export default function InputForm() {
-  const [input, setInput] = useState({} as todoObj);
-  const [editOn, setEditOn] = useState<boolean>(false);
-  const [editIndx] = useState<string>("");
+  // const [input, setInput] = useState({} as todoObj);
+  // const [editOn, setEditOn] = useState<boolean>(false);
+  // const [editIndx] = useState<string>("");
 
-  const [updateTodo] = useUpdateTodoMutation();
-  const [postTodos] = usePostTodosMutation();
+  // const [updateTodo] = useUpdateTodoMutation();
+  // const [postTodos] = usePostTodosMutation();
 
-  const handleClick = (e: FormEvent) => {
-    e.preventDefault();
-    if (editOn === false) {
-      postTodos({ id: input.id, task: input.task });
-    } else {
-      updateTodo({ _id: editIndx, id: input.id, task: input.task });
+  const onSubmit = (data: todoObj2) => {
+    // if (editOn === false) {
+    //   postTodos({ id: input.id, task: input.task });
+    // } else {
+    //   updateTodo({ _id: editIndx, id: input.id, task: input.task });
 
-      setEditOn(false);
-    }
+    //   setEditOn(false);
+    // }
+    console.log(data);
   };
 
-  //   const handleEdit = (index: number, _id: string) => {
-  //     const editItem: todoObj[] = data?.filter((_, indx) => indx === index) || [];
-  //     setInput(editItem[0]);
-  //     setEditOn(true);
-  //     setEditIndx(_id);
-  //   };
+  const { register, handleSubmit } = useForm<todoObj2>({
+    defaultValues: { id: "33" },
+  });
 
   return (
-    <div>
-      <div className="flex gap-3">
-        <input
-          type="text"
-          className="border-black border-2 rounded-md"
-          placeholder="Type Id here"
-          onChange={(e) =>
-            setInput((prev) => ({
-              ...prev,
-              [e.target.name]: e.target.value,
-            }))
-          }
-          value={input.id}
-          name="id"
+    <Grid container spacing={2}>
+      <Grid
+        component="form"
+        onClick={handleSubmit(onSubmit)}
+        item
+        noValidate
+        sx={{ display: "flex", flexDirection: "column", gap: "15px" }}
+      >
+        <TextField
+          {...register("id", { required: "Id is required!" })}
+          label="Id"
+          type="id"
         />
-        <input
-          type="text"
-          className="border-black border-2 rounded-md"
-          placeholder="Type Task here"
-          onChange={(e) =>
-            setInput((prev) => ({
-              ...prev,
-              [e.target.name]: e.target.value,
-            }))
-          }
-          value={input.task}
-          name="task"
-        />
-        <button
-          onClick={handleClick}
-          className="px-2 py-1 bg-green-600 rounded-md shadow-lg font-semibold"
-        >
-          Enter
-        </button>
-      </div>
-    </div>
+        <TextField {...register("task")} label="Task" type="task" />
+        <Button type="submit" variant="contained" color="primary">
+          Submit
+        </Button>
+      </Grid>
+    </Grid>
   );
 }
