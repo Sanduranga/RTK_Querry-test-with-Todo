@@ -4,17 +4,46 @@ import { todoObj } from "./models/models";
 import {
   useDeleteTodoMutation,
   useGetTodosQuery,
-  usePostTodosMutation,
   useUpdateTodoMutation,
 } from "./redux/todotApi";
+import Navbar from "./components/Navbar";
 
-function App() {
+import { Amplify } from "aws-amplify";
+import type { WithAuthenticatorProps } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
+import config from "./Amp";
+import { fetchUserAttributes } from "aws-amplify/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "./redux/store";
+import { setUserName } from "./redux/loggedUserReducer";
+import InputForm from "./components/InputForm";
+Amplify.configure(config);
+
+function App({ signOut }: WithAuthenticatorProps) {
+  useEffect(() => {
+    // Fetch the authenticated user on component mount
+    handleFetchUserAttributes();
+  }, []);
+  const loggedUserName = useSelector(
+    (state: RootState) => state.loggingUser.name
+  );
+  const dispatch = useDispatch();
+  async function handleFetchUserAttributes() {
+    try {
+      const userAttributes = await fetchUserAttributes();
+      dispatch(setUserName(userAttributes.name));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   const [input, setInput] = useState({} as todoObj);
+
   // const [list, setList] = useState<todoObj[]>([]);
   const [editOn, setEditOn] = useState<boolean>(false);
   const [editIndx, setEditIndx] = useState<string>("");
   const { data, isLoading, error, isSuccess } = useGetTodosQuery();
-  const [postTodos] = usePostTodosMutation();
+
   const [deleteTodo] = useDeleteTodoMutation();
   const [updateTodo] = useUpdateTodoMutation();
 
@@ -38,7 +67,7 @@ function App() {
   const handleClick = (e: FormEvent) => {
     e.preventDefault();
     if (editOn === false) {
-      postTodos({ id: input.id, task: input.task });
+      // postTodos({ id: input.id, task: input.task });
       // setList((prev) => [...prev, input]);
       // const postTodo = async () => {
       //   try {
@@ -106,13 +135,13 @@ function App() {
   };
 
   const handleDelete = (_id: string) => {
+    deleteTodo(_id);
     // () =>   (Down function I had implemented before)
     //   setList((prev) =>
     //     prev.filter((_, ind) => ind !== index)
     //   )
     // const deleteTodo = async () => {
 
-    deleteTodo(_id);
     //   try {
     //     const res = await fetch("http://localhost:5555/delete_todo", {
     //       method: "DELETE",
@@ -135,46 +164,19 @@ function App() {
   };
 
   return (
-    <div className="flex w-full">
+    <div className="flex flex-col w-full">
+      <Navbar />
+      <div>
+        <h1>Hello {loggedUserName}</h1>
+        <button onClick={signOut}>Sign out</button>
+      </div>
       <div className="flex flex-col gap-10 mx-auto items-center bg-green-300 px-3 py-4 mt-5 rounded-md shadow-md">
         <div className="mx-auto font-bold text-xl">
           <h1>ToDo App</h1>
         </div>
-        <div>
-          <div className="flex gap-3">
-            <input
-              type="text"
-              className="border-black border-2 rounded-md"
-              placeholder="Type Id here"
-              onChange={(e) =>
-                setInput((prev) => ({
-                  ...prev,
-                  [e.target.name]: e.target.value,
-                }))
-              }
-              value={input.id}
-              name="id"
-            />
-            <input
-              type="text"
-              className="border-black border-2 rounded-md"
-              placeholder="Type Task here"
-              onChange={(e) =>
-                setInput((prev) => ({
-                  ...prev,
-                  [e.target.name]: e.target.value,
-                }))
-              }
-              value={input.task}
-              name="task"
-            />
-            <button
-              onClick={handleClick}
-              className="px-2 py-1 bg-green-600 rounded-md shadow-lg font-semibold"
-            >
-              Enter
-            </button>
-          </div>
+        <div onClick={handleClick}>
+          {/* <div className="flex gap-3">kkkoppklkkkk</div> */}
+          <InputForm />
         </div>
         <div className="flex flex-col">
           {isLoading && (
