@@ -47,23 +47,23 @@ function App({ signOut }: WithAuthenticatorProps) {
   const [deleteTodo] = useDeleteTodoMutation();
   const [updateTodo] = useUpdateTodoMutation();
 
-  useEffect(() => {
-    fetchTodos();
-  }, []);
+  // useEffect(() => {
+  //   fetchTodos();
+  // }, []);
 
-  const fetchTodos = async () => {
-    try {
-      // const res = await fetch("http://localhost:5555/todos");
-      // if (!res.ok) {
-      //   throw new Error("Fetching error!!");
-      // }
-      // const { response } = await res.json();
-      // setList(data ? data : []);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
+  // const fetchTodos = async () => {
+  //   try {
+  //     // const res = await fetch("http://localhost:5555/todos");
+  //     // if (!res.ok) {
+  //     //   throw new Error("Fetching error!!");
+  //     // }
+  //     // const { response } = await res.json();
+  //     // setList(data ? data : []);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+  // sss
   const handleClick = (e: FormEvent) => {
     e.preventDefault();
     if (editOn === false) {
